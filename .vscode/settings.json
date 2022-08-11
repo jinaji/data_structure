@@ -1,0 +1,14 @@
+{
+	"files.associations": {
+		"arraylist.h": "c",
+		"arraystack.h": "c",
+		"stdio.h": "c",
+		"array": "c",
+		"vector": "c",
+		"string": "c",
+		"string_view": "c",
+		"__node_handle": "c",
+		"linkedstack.h": "c",
+		"simlinkedqueue.h": "c"
+	}
+}
