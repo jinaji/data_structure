@@ -146,9 +146,7 @@ void	clearLinkdeDeque(LinkedCustomer* pDeque)
 		free(deleteFrontLD(pDeque));
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////////////
-
 
 void	insertCustomer(int arrivalTime, int processTime, LinkedCustomer *pDeque)
 {
@@ -159,6 +157,10 @@ void	insertCustomer(int arrivalTime, int processTime, LinkedCustomer *pDeque)
 	tmp.status = arrival;
 	tmp.arrivalTime = arrivalTime;
 	tmp.serviceTime = processTime;
+	tmp.endTime = 0;
+	tmp.pLLink = 0;
+	tmp.pRLink = 0;
+	tmp.startTime = 0;
 	insertFrontLD(pDeque, tmp);
 }
 
@@ -180,11 +182,9 @@ SimCustomer	*processServiceNodeStart(int currentTime, LinkedCustomer *pWaitDeque
 
 SimCustomer	*processServiceNodeEnd(int currentTime, SimCustomer *pServiceNode, int *pServiceUserCount, int *pTotalWaitTime)
 {
-	if (currentTime == pServiceNode->endTime)
-		(*pServiceUserCount)--;
-	printf ("a %d s %d\n", pServiceNode->arrivalTime, pServiceNode->startTime);
-	*pTotalWaitTime += pServiceNode->startTime - pServiceNode->arrivalTime;
+	(*pServiceUserCount)--;
 	pServiceNode->status = end;
+	*pTotalWaitTime += pServiceNode->startTime - pServiceNode->arrivalTime;
 	return (pServiceNode);
 }
 
@@ -206,7 +206,24 @@ void	printWaitDequeStatus(int currentTime, LinkedCustomer *pWaitDeque)
 	printf("%d is waiting %d\n", pWaitDeque->currentElementCount, currentTime - pWaitDeque->pRearNode->arrivalTime);
 }
 
-void	printReport(LinkedCustomer *pWaitQueue, int serviceUserCount, int totalWaitTime);
+void	printReport(LinkedCustomer *pWaitQueue, int serviceUserCount, int totalWaitTime)
+{
+	SimCustomer	*tmp;
+	int	i = 1;
+
+	tmp = pWaitQueue->pRearNode;
+	while (tmp->pLLink)
+	{
+		printf ("%d is on service\n", serviceUserCount);
+		printf ("waiting number %d\n", i);
+		printf ("arrival time: %d\n", tmp->arrivalTime);
+		printf ("service time: %d\n", tmp->serviceTime);
+		i++;
+		tmp = tmp->pLLink;
+	}
+	printf ("waitinglist : %d\n", i);
+	printf ("total waittime is %d\n", totalWaitTime);
+}
 
 int main()
 {
@@ -227,20 +244,15 @@ int main()
 	{
 		if (pArrivalDeque->pRearNode && (currentTime == pArrivalDeque->pRearNode->arrivalTime))
 			processArrival(currentTime, pArrivalDeque, pWaitDeque);
+		if (pServiceUserCount && tmp->endTime == currentTime)
+			free(processServiceNodeEnd(currentTime, tmp, &pServiceUserCount, &pTotalWaitTime));
 		if (pServiceUserCount == 0)
 		{
 			tmp = processServiceNodeStart(currentTime, pWaitDeque);
 			pServiceUserCount++;
 		}
-		// else
-		// 	pTotalWaitTime++;
-		// else if (pWaitDeque->pRearNode) // 아무도 안 기다리느 걸 카운트하는것같음 ??
-		// 	pTotalWaitTime++;
 		if (!tmp)
 			break ;
-		if (currentTime == tmp->endTime)
-			free(processServiceNodeEnd(currentTime, tmp, &pServiceUserCount, &pTotalWaitTime));
-		printWaitDequeStatus(currentTime, pWaitDeque);
 	}
-	printf("%d\n", pTotalWaitTime);
+	printf("wait %d\n", pTotalWaitTime);
 }
