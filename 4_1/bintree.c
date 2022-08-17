@@ -1,6 +1,7 @@
 #include "bintree.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include <errno.h>
 
 BinTree* makeBinTree(BinTreeNode rootNode)
 {
@@ -8,7 +9,10 @@ BinTree* makeBinTree(BinTreeNode rootNode)
 
 	tree = (BinTree *)malloc(sizeof(BinTree));
 	if (!tree)
-		exit (errno());
+		exit (0);
+	tree->pRootNode = malloc(sizeof(BinTreeNode));
+	if (!tree->pRootNode)
+		exit (0);
 	tree->pRootNode->data = rootNode.data;
 	tree->pRootNode->visited = 0;
 	tree->pRootNode->pParent = NULL;
@@ -20,7 +24,7 @@ BinTree* makeBinTree(BinTreeNode rootNode)
 BinTreeNode* getRootNodeBT(BinTree* pBinTree)
 {
 	if (!pBinTree || !pBinTree->pRootNode)
-		exit (errno());
+		exit (0);
 	return (pBinTree->pRootNode);
 }
 
@@ -30,7 +34,7 @@ BinTreeNode* insertLeftChildNodeBT(BinTreeNode* pParentNode, BinTreeNode element
 
 	new = (BinTreeNode *)malloc(sizeof(BinTreeNode));
 	if (!new)
-		exit (errno());
+		exit (0);
 	*new = element;
 	pParentNode->pLeftChild = new;
 	new->pParent = pParentNode;
@@ -43,7 +47,7 @@ BinTreeNode* insertRightChildNodeBT(BinTreeNode* pParentNode, BinTreeNode elemen
 
 	new = (BinTreeNode *)malloc(sizeof(BinTreeNode));
 	if (!new)
-		exit (errno());
+		exit (0);
 	*new = element;
 	pParentNode->pRightChild = new;
 	new->pParent = pParentNode;
@@ -53,14 +57,14 @@ BinTreeNode* insertRightChildNodeBT(BinTreeNode* pParentNode, BinTreeNode elemen
 BinTreeNode* getLeftChildNodeBT(BinTreeNode* pNode)
 {
 	if (!pNode)
-		exit (errno());
+		exit (0);
 	return (pNode->pLeftChild);
 }
 
 BinTreeNode* getRightChildNodeBT(BinTreeNode* pNode)
 {
 	if (!pNode)
-		exit (errno());
+		exit (0);
 	return (pNode->pRightChild);
 }
 
@@ -76,7 +80,7 @@ void deleteBinTreeNode(BinTree *pBinTree, BinTreeNode* pNode)
 	BinTreeNode	*papa;
 
 	if (!pBinTree || !pNode)
-		exit (errno());
+		exit (0);
 	papa = pNode->pParent;
 	if (pNode->pLeftChild == NULL && pNode->pRightChild == NULL)
 	{
@@ -118,22 +122,50 @@ void deleteBinTreeNode(BinTree *pBinTree, BinTreeNode* pNode)
 	}
 }
 
-BinTreeNode	*findJari(BinTreeNode *tmp, int *jari)
+// BinTreeNode	*findJari(BinTreeNode *tmp, int *jari)
+// {
+// 	while (tmp)
+// 	{
+// 		if (!tmp->pLeftChild)
+// 		{			
+// 			*jari = 0;
+// 			return (tmp);
+// 		}
+// 		else if (!tmp->pRightChild)
+// 		{
+// 			*jari = 1;
+// 			return (tmp);
+// 		}
+// 		else if
+// 	}
+// }
+
+
+void	preTravelTree(BinTreeNode *pNode)
 {
-	while (tmp)
-	{
-		if (!tmp->pLeftChild)
-		{			
-			*jari = 0;
-			return (tmp);
-		}
-		else if (!tmp->pRightChild)
-		{
-			*jari = 1;
-			return (tmp);
-		}
-		else if
-	}
+	if (!pNode)
+		return ;
+	printf("%c\n", pNode->data);
+	preTravelTree(pNode->pLeftChild);
+	preTravelTree(pNode->pRightChild);
+}
+
+void	midTravelTree(BinTreeNode *pNode)
+{
+	if (!pNode)
+		return ;
+	midTravelTree(pNode->pLeftChild);
+	printf("%c\n", pNode->data);
+	midTravelTree(pNode->pRightChild);
+}
+
+void	backTravelTree(BinTreeNode *pNode)
+{
+	if (!pNode)
+		return ;
+	backTravelTree(pNode->pLeftChild);
+	backTravelTree(pNode->pRightChild);
+	printf("%c\n", pNode->data);
 }
 
 int main()
@@ -142,20 +174,66 @@ int main()
 	BinTreeNode	root;
 	BinTreeNode *tmp;
 	BinTreeNode element;
-	root.data = '0';
-	int	i = 1;
-	int	jari;
+	// root.data = '0';
+	// int	i = 1;
+	// int	jari;
 
-	pBinTree = makeBinTree(root);
-	while (i < 10)
-	{
-		tmp = &root;
-		element.data = i + '0';
-		jari = findJari(tmp);
+	// pBinTree = makeBinTree(root);
+	// while (i < 10)
+	// {
+	// 	tmp = &root;
+	// 	element.data = i + '0';
+	// 	jari = findJari(tmp);
 		
-		if (jari == 0)
-			insertLeftChildNodeBT(tmp, element);
-		else if (jari == 1)
-			insertRightChildNodeBT(tmp, element);
-	}
-}
+	// 	if (jari == 0)
+	// 		insertLeftChildNodeBT(tmp, element);
+	// 	else if (jari == 1)
+	// 		insertRightChildNodeBT(tmp, element);
+	// }
+
+	BinTreeNode *Lparent;
+	BinTreeNode	*Rparent;
+
+	element.data = 'A';
+	pBinTree = makeBinTree(element);
+	element.data += 1; // B
+	insertLeftChildNodeBT(pBinTree->pRootNode, element);
+	element.data += 1; // C
+	insertRightChildNodeBT(pBinTree->pRootNode, element);
+	element.data += 1; // D
+	Lparent = pBinTree->pRootNode->pLeftChild;
+	Rparent = pBinTree->pRootNode->pRightChild;
+	insertLeftChildNodeBT(Lparent, element);
+	element.data += 1; // E
+	insertRightChildNodeBT(Lparent, element);
+	element.data += 1; // F
+	insertLeftChildNodeBT(Rparent, element);
+	element.data += 1; // G
+	insertRightChildNodeBT(Rparent, element);
+	element.data += 1; // H
+	Rparent = Lparent->pRightChild; // E
+	Lparent = Lparent->pLeftChild; // D
+	insertLeftChildNodeBT(Lparent, element);
+	element.data += 1; // I
+	insertRightChildNodeBT(Lparent, element);
+	element.data += 1; // J
+	insertLeftChildNodeBT(Rparent, element);
+	// printf("%c\n", Rparent->data);
+	// printf("%c\n", Rparent->pParent->data);
+	element.data += 1; // K
+	Lparent = pBinTree->pRootNode->pRightChild->pLeftChild; // F
+	// printf("%c\n", Lparent->data);
+	Rparent = Lparent->pParent->pRightChild; // G
+	insertRightChildNodeBT(Lparent, element);
+	element.data += 1; // L
+	insertLeftChildNodeBT(Rparent, element);
+	// printf("%c\n", Rparent->pLeftChild->data);
+	element.data += 1; // M
+	insertRightChildNodeBT(Rparent, element);
+	// printf("%c\n", Rparent->pLeftChild->data);
+
+	backTravelTree(pBinTree->pRootNode);
+// 	printf("%c\n", pBinTree->pRootNode->pLeftChild->pRightChild->pLeftChild->data);
+// 	printf("%c\n", pBinTree->pRootNode->pRightChild->pRightChild->pLeftChild->data);
+// 	printf("%c\n", pBinTree->pRootNode->pRightChild->pRightChild->pRightChild->data);
+ }
